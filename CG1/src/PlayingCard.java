@@ -1,17 +1,29 @@
 public class PlayingCard {
     private int coordX;
     private int coordY;
-    private int wight;
-    private int height;
+    private int wight = 125;
+    private int height = 175;
     private int turn;
-    private double size;
     private int denomination;
 
 
-    public PlayingCard(int coordX, int coordY, int size) {
-        this.coordX = coordX;
-        this.coordY = coordY;
-        this.size = size;
+    public PlayingCard(Location location, int turn) {
+        this.turn = turn;
+    }
+
+    private void findLocation(Location location) {
+        switch (location) {
+            case PLAYER_ONE_CARD_1:
+                wight *= (int) 1.2;
+                height *= (int) 1.2;
+                coordX = (int) (Viewport.VIEWPORT_WIDTH / 2 - Viewport.VIEWPORT_WIDTH * 0.10) + getWight() / 2;
+                coordY = (int) (Viewport.VIEWPORT_HEIGHT * 0.7);
+            case PLAYER_ONE_CARD_2:
+                wight *= (int) 1.2;
+                height *= (int) 1.2;
+                coordX = (int) (Viewport.VIEWPORT_WIDTH / 2 + Viewport.VIEWPORT_WIDTH * 0.10) + getWight() / 2;
+                coordY = (int) (Viewport.VIEWPORT_HEIGHT * 0.7);
+        }
     }
 
     public int getCoordX() {
@@ -22,8 +34,8 @@ public class PlayingCard {
         return coordY;
     }
 
-    public double getSize() {
-        return size;
+    public int getTurn() {
+        return turn;
     }
 
     public int getWight() {

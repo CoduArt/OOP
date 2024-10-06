@@ -5,21 +5,12 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Random;
 
-// Требования к лабораторной работе
-//  - Не использовать магические числа
-//        drawRect(123, 123, 12, 15); - плохо
-//        drawRect(HOUSE_POS_X, HOUSE_POS_Y, HOUSE_WIDTH, HOUSE_HEIGHT); - хорошо
-//  - Выносить рисовку отдельных объектов в отдельные методы
-//      - Рисовать всё внутри paintComponent - плохо.
-//      - Желательно создавать отдельные методы для рисования.
-//          public void drawHouse(Graphics g,
-//              int posX, int posY, int width, int height, Color color);
-//   - Для получения максимального балла по задаче нужна анимация.
-
 
 class Viewport extends JPanel {
-    private final int VIEWPORT_WIDTH = 980;
-    private final int VIEWPORT_HEIGHT = 760;
+    public static final int VIEWPORT_WIDTH = 980;
+    public static final int VIEWPORT_HEIGHT = 760;
+    private final PlayingCard testCard = new PlayingCard(Location.PLAYER_ONE_CARD_1, 1);
+    private final PlayingCard testCard2 = new PlayingCard( Location.PLAYER_ONE_CARD_2,, 2);
 
 
     public Viewport() {
@@ -36,16 +27,15 @@ class Viewport extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        drawPlayingCard(g);
+        drawPlayingCard(g, testCard);
+        drawPlayingCard(g, testCard2);
 
     }
 
 
-    private void drawPlayingCard(Graphics g) {
-        g.setColor(new Color(0x9E0E0E));
-        g.fillRoundRect((int) (VIEWPORT_WIDTH / 6.5), VIEWPORT_HEIGHT/2, 150, 225, 20, 20);
+    private void drawPlayingCard(Graphics g, PlayingCard card) {
         g.setColor(Color.BLACK);
-        g.drawRoundRect(VIEWPORT_WIDTH/2, VIEWPORT_HEIGHT/2, 150, 225, 20, 20);
+        g.drawRoundRect(card.getCoordX(), card.getCoordY(), card.getWight(), card.getHeight(), 15, 15);
     }
 
 }
