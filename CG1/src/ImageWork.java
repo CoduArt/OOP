@@ -44,18 +44,23 @@ public class ImageWork {
 
     private static int[] buildStart(Image img, PlayingCard card) {
         int[] start = new int[2];
+        int[] indent = findNewCenter(img);
         switch (card.getTurn()) {
             case 5, 1 -> {
-                start[0] = ImageCardCoordination.GLOBAL_INDENT + (card.getDenomination() - 1) * (ImageCardCoordination.WEIGHT + ImageCardCoordination.INDENT_X) + card.getDenomination() / 2;
-                start[1] = ImageCardCoordination.GLOBAL_INDENT + (card.getSuit() - 1) * (ImageCardCoordination.HEIGHT + ImageCardCoordination.INDENT_Y);
+                start[0] = ImageCardCoordination.GLOBAL_INDENT + (card.getDenomination() - 1) * (ImageCardCoordination.WEIGHT + ImageCardCoordination.INDENT_X) + card.getDenomination() / 2 + indent[0];
+                start[1] = ImageCardCoordination.GLOBAL_INDENT + (card.getSuit() - 1) * (ImageCardCoordination.HEIGHT + ImageCardCoordination.INDENT_Y) + indent[1];
             }
             case 2 -> {
-//                start[0] = ImageCardCoordination.GLOBAL_INDENT + (card.getDenomination() - 1) * (ImageCardCoordination.HEIGHT + ImageCardCoordination.INDENT_Y);
-//                start[1] = ImageCardCoordination.GLOBAL_INDENT + (card.getSuit() - 1) * (ImageCardCoordination.WEIGHT + ImageCardCoordination.INDENT_X) + card.getDenomination() / 2;
+                start[0] = img.getWidth(null) - (ImageCardCoordination.GLOBAL_INDENT + (card.getSuit() - 1) * (ImageCardCoordination.HEIGHT + ImageCardCoordination.INDENT_Y) + indent[0]) - ImageCardCoordination.HEIGHT;
+                start[1] = ImageCardCoordination.GLOBAL_INDENT + (card.getDenomination() - 1) * (ImageCardCoordination.WEIGHT + ImageCardCoordination.INDENT_X) + card.getDenomination() / 2 + indent[1];
             }
             case 3 -> {
-                start[0] = img.getWidth(null) - (ImageCardCoordination.GLOBAL_INDENT + (card.getDenomination() - 1) * (ImageCardCoordination.WEIGHT + ImageCardCoordination.INDENT_X)) - ImageCardCoordination.WEIGHT;
-                start[1] = img.getHeight(null) - (ImageCardCoordination.GLOBAL_INDENT + (card.getSuit() - 1) * (ImageCardCoordination.HEIGHT + ImageCardCoordination.INDENT_Y) + card.getDenomination() / 2) - ImageCardCoordination.HEIGHT;
+                card = new PlayingCard(Location.PLAYER_TWO_CARD_1, new Card(1, 1));
+                start[0] = img.getWidth(null) - (ImageCardCoordination.GLOBAL_INDENT / 10 + (card.getDenomination() - 1) * (ImageCardCoordination.WEIGHT + ImageCardCoordination.INDENT_X) + indent[0] + card.getDenomination() / 2) - ImageCardCoordination.WEIGHT;
+                start[1] = img.getHeight(null) - (ImageCardCoordination.GLOBAL_INDENT + (card.getSuit() - 1) * (ImageCardCoordination.HEIGHT + ImageCardCoordination.INDENT_Y) + indent[1]) - ImageCardCoordination.HEIGHT;
+//                System.out.println(img.getHeight(null));
+//                start[0] = 2687;
+//                start[1] = 1960; //Проблема в Y координате
             }
             case 4 -> {
                 start[0] = img.getWidth(null) - (ImageCardCoordination.GLOBAL_INDENT + (card.getDenomination() - 1) * (ImageCardCoordination.HEIGHT + ImageCardCoordination.INDENT_Y)) - ImageCardCoordination.HEIGHT;
@@ -63,6 +68,20 @@ public class ImageWork {
             }
         }
         return start;
+    }
+
+    private static int[] findNewCenter(Image img) {
+        Color colorT;
+        for (int x = 0; x < img.getWidth(null); x++) {
+            for (int y = 0; y < img.getHeight(null); y++) {
+                colorT = new Color(toBufferedImage(img).getRGB(x,y), true);
+                if (colorT.equals(Viewport.BG_COLOR)) {
+//                    System.out.println(x + " " + y);
+                    return new int[] {x, y};
+                }
+            }
+        }
+        return null;
     }
 
     private static void paintImage(Graphics g, Image img, int VX1, int VY1, int VX2, int VY2, int IX1, int IY1, int IX2, int IY2) {

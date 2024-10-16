@@ -10,6 +10,7 @@ import java.util.Random;
 class Viewport extends JPanel {
     public static final int VIEWPORT_WIDTH = 1280;
     public static final int VIEWPORT_HEIGHT = 960;
+    public static final Color BG_COLOR = new Color(14, 106, 33);
 
     private Deck playingDeck = new Deck();
     private ArrayList<PlayingCard> cardList = new ArrayList<>();
@@ -17,7 +18,7 @@ class Viewport extends JPanel {
 
 
     public Viewport() {
-        setBackground(new Color(14, 105, 33));
+        setBackground(BG_COLOR);
         setPreferredSize(new Dimension(VIEWPORT_WIDTH, VIEWPORT_HEIGHT));
         dealsCards();
     }
@@ -117,7 +118,7 @@ public class Main extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 viewport.update(1.0f / 33.0f);
-                viewport.repaint();
+//                viewport.repaint();
             }
         });
 
@@ -125,7 +126,7 @@ public class Main extends JFrame {
         setVisible(true);
 
         // Запускаем таймер
-        timer.start();
+//        timer.start();
 
     }
 

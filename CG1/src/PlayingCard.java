@@ -30,12 +30,14 @@ public class PlayingCard extends Card {
                 break;
             case PLAYER_TWO_CARD_1:
                 definitionLocationHorizontal(-1, 0.07);
+                opened = true;
                 break;
             case PLAYER_TWO_CARD_2:
                 definitionLocationHorizontal(1, 0.07);
                 break;
             case PLAYER_THREE_CARD_1:
                 definitionLocationVertical(-1, 0.12);
+                opened = true;
                 break;
             case PLAYER_THREE_CARD_2:
                 definitionLocationVertical(1, 0.12);

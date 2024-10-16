@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 public class Deck {
@@ -6,11 +7,10 @@ public class Deck {
     private final int CLUBS = 2;
     private final int DIAMONDS = 3;
     private final int HEARTS = 4;
-    private final Random r = new Random();
     private ArrayList<Card> deckList = new ArrayList<>();
 
     public Card getCard() {
-        return deckList.get(r.nextInt(deckList.size()));
+        return deckList.remove(1);
     }
 
     public void updateDeck() {
@@ -20,5 +20,6 @@ public class Deck {
                 deckList.add(new Card(den, suit));
             }
         }
+        Collections.shuffle(deckList);
     }
 }
