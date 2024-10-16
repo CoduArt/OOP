@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -48,7 +49,8 @@ class Viewport extends JPanel {
         if (card.isOpened()) {
             g.setColor(new Color(0xFFBBA9AF, true));
             g.fillRoundRect(card.getCoordX(), card.getCoordY(), card.getWight(), card.getHeight(), 15, 15);
-            paintCardDenomination(g, card);
+//            paintCardDenomination(g, card);
+            ImageWork.paintCardImage(g, card);
         } else {
             paintCardShirt(g, card);
 //            g.setColor(new Color(0xFF9B8690, true));
@@ -74,25 +76,18 @@ class Viewport extends JPanel {
         g.drawImage(img, card.getCoordX(), card.getCoordY(), card.getWight(), card.getHeight(), null);
     }
 
-    private void paintCardDenomination(Graphics g, PlayingCard card) {
-//        card = new PlayingCard(Location.PLAYER_ONE_CARD_1, new Card(13, 4));
-        int startImageX = ImageCardCoordination.GLOBAL_INDENT + (card.getDenomination() - 1) * (ImageCardCoordination.WEIGHT + ImageCardCoordination.INDENT_X) + card.getDenomination() / 2;
-        int startImageY = ImageCardCoordination.GLOBAL_INDENT + (card.getSuit() - 1) * (ImageCardCoordination.HEIGHT + ImageCardCoordination.INDENT_Y);
-        Image img = new ImageIcon("src/CardsPack/CardsWithGreen2.jpg").getImage();
-//        g.drawImage(img, card.getCoordX(), card.getCoordY(), card.getWight(), card.getHeight(), null);
-        g.drawImage(img, card.getCoordX(), card.getCoordY(), card.getCoordX() + card.getWight(),
-                card.getCoordY() + card.getHeight(), startImageX, startImageY , startImageX + ImageCardCoordination.WEIGHT,
-                startImageY + ImageCardCoordination.HEIGHT, null);
-    }
+//    private void paintCardDenomination(Graphics g, PlayingCard card) {
+////        card = new PlayingCard(Location.PLAYER_ONE_CARD_1, new Card(13, 4));
+//        int startImageX = ImageCardCoordination.GLOBAL_INDENT + (card.getDenomination() - 1) * (ImageCardCoordination.WEIGHT + ImageCardCoordination.INDENT_X) + card.getDenomination() / 2;
+//        int startImageY = ImageCardCoordination.GLOBAL_INDENT + (card.getSuit() - 1) * (ImageCardCoordination.HEIGHT + ImageCardCoordination.INDENT_Y);
+//        Image img = new ImageIcon("src/CardsPack/CardsWithGreen2.jpg").getImage();
+//        img = ImageWork.rotate(img, 1);
+////        g.drawImage(img, card.getCoordX(), card.getCoordY(), card.getWight(), card.getHeight(), null);
+//        g.drawImage(img, card.getCoordX(), card.getCoordY(), card.getCoordX() + card.getWight(),
+//                card.getCoordY() + card.getHeight(), startImageX, startImageY , startImageX + ImageCardCoordination.WEIGHT,
+//                startImageY + ImageCardCoordination.HEIGHT, null);
+//    }
 
-}
-
-class ImageCardCoordination {
-    final static int GLOBAL_INDENT = 60;
-    final static int INDENT_X = 26;
-    final static int INDENT_Y = 50;
-    final static int HEIGHT = 276;
-    final static int WEIGHT = 197;
 }
 
 
