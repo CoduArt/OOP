@@ -46,6 +46,7 @@ public class PlayingCard extends Card {
                 definitionLocationHorizontal(-1, 0.9);
                 break;
             case PLAYER_FOUR_CARD_2:
+                opened = true;
                 definitionLocationHorizontal(1, 0.9);
                 break;
             case TABLE_CARD_1:
