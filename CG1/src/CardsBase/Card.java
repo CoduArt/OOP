@@ -1,3 +1,5 @@
+package CardsBase;
+
 public class Card {
     private int denomination;
     private int suit;

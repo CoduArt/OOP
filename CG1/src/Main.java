@@ -1,26 +1,58 @@
+import CardsBase.Deck;
+import CardsBase.GameParams;
+import CardsBase.Location;
+import CardsBase.PlayingCard;
+import Trackers.Buttons;
+import Trackers.ChipTracker;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Random;
 
 
 class Viewport extends JPanel {
-    public static final int VIEWPORT_WIDTH = 1280;
-    public static final int VIEWPORT_HEIGHT = 960;
-    public static final Color BG_COLOR = new Color(14, 106, 33);
-
+    private Buttons buttons = new Buttons();
     private Deck playingDeck = new Deck();
     private ArrayList<PlayingCard> cardList = new ArrayList<>();
+    private ArrayList<Player> players = new ArrayList<>();
+    private int currentPlayer;
 
 
 
     public Viewport() {
-        setBackground(BG_COLOR);
-        setPreferredSize(new Dimension(VIEWPORT_WIDTH, VIEWPORT_HEIGHT));
+        setBackground(GameParams.BG_COLOR);
+        setPreferredSize(new Dimension(GameParams.VIEWPORT_WIDTH, GameParams.VIEWPORT_HEIGHT));
+        startNewGame();
+    }
+
+    public void startNewGame() {
         dealsCards();
+        players.clear();
+        for (int i = 1; i < 8; i += 2) {
+            players.add(new Player(null, null, new ChipTracker(cardList.get(i))));
+        }
+        currentPlayer = 4;
+        startNewTurn();
+    }
+
+    public void startNewTurn() {
+        dealsCards();
+        int countCards = 1;
+        int countPlayers = 0;
+        while (countPlayers < players.size()) {
+            players.get(countPlayers).newLayout(cardList.get(countCards - 1), cardList.get(countCards));
+            countCards += 2;
+            countPlayers++;
+        }
+        if (currentPlayer > 3) {
+            currentPlayer = 0;
+        } else {
+            currentPlayer++;
+        }
     }
 
      private void dealsCards() {
@@ -40,55 +72,47 @@ class Viewport extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         for (PlayingCard card: cardList) {
-            drawPlayingCard(g, card);
+            drawingClass.drawPlayingCard(g, card);
+        }
+        for (Player player: players) {
+            drawingClass.drawMoneysTrackers(g, player);
+        }
+        for (Trackers.Button button: buttons.getButtons()) {
+            drawingClass.drawButton(g, button);
         }
 
     }
 
+}
 
-    private void drawPlayingCard(Graphics g, PlayingCard card) {
-        if (card.isOpened()) {
-            g.setColor(new Color(0xFFBBA9AF, true));
-            g.fillRoundRect(card.getCoordX(), card.getCoordY(), card.getWight(), card.getHeight(), 15, 15);
-//            paintCardDenomination(g, card);
+class drawingClass {
+    private static final Font TEXT_FONT = new Font(null, Font.PLAIN, 20);
+
+    public static void drawButton(Graphics g, Trackers.Button button) {
+        g.setColor(new Color(0x413535));
+        g.fillRoundRect(button.getX(), button.getY(), button.getWight(), button.getHeight(), 15, 15);
+        g.setFont(TEXT_FONT);
+        g.setColor(new Color(0x000000));
+        g.drawRoundRect(button.getX(), button.getY(), button.getWight(), button.getHeight(), 15, 15);
+        g.drawString(button.getAction(),
+                button.getX() + button.getWight() / 2 - TEXT_FONT.getSize() / 4 - (button.getAction().length() - 1) * TEXT_FONT.getSize() / 4,
+                button.getY() + button.getHeight() / 2 + TEXT_FONT.getSize() / 3);
+    }
+
+    public static void drawPlayingCard(Graphics g, PlayingCard card) {
+        if (card.isOpened() == 1) {
             ImageWork.paintCardImage(g, card);
-        } else {
-            paintCardShirt(g, card);
-//            g.setColor(new Color(0xFF9B8690, true));
-//            g.fillRoundRect(card.getCoordX(), card.getCoordY(), card.getWight(), card.getHeight(), 15, 15);
-//            g.setColor(new Color(0xFF880E0E, true));
-//            g.fillRoundRect((int) (card.getCoordX() + card.getWight() * 0.05),
-//                    (int) (card.getCoordY() + card.getHeight() * 0.05),
-//                    (int) (card.getWight() * 0.9),
-//                    (int) (card.getHeight() * 0.9), 15, 15);
-//            g.setColor(Color.BLACK);
-//            g.drawRoundRect((int) (card.getCoordX() + card.getWight() * 0.05),
-//                    (int) (card.getCoordY() + card.getHeight() * 0.05),
-//                    (int) (card.getWight() * 0.9),
-//                    (int) (card.getHeight() * 0.9), 15, 15);
+        } else if (card.isOpened() == -1) {
+            ImageWork.paintCardShirt(g, card);
+            g.setColor(Color.BLACK);
+            g.drawRoundRect(card.getCoordX(), card.getCoordY(), card.getWight(), card.getHeight(), 15, 15);
         }
-
-        g.setColor(Color.BLACK);
-        g.drawRoundRect(card.getCoordX(), card.getCoordY(), card.getWight(), card.getHeight(), 15, 15);
     }
 
-    private void paintCardShirt(Graphics g, PlayingCard card) {
-        Image img = new ImageIcon("src/CardsPack/Shirt.png").getImage();
-        g.drawImage(img, card.getCoordX(), card.getCoordY(), card.getWight(), card.getHeight(), null);
+    public static void drawMoneysTrackers(Graphics g, Player player) {
+        ImageWork.paintChip(g, player.getChipTracker());
+        ImageWork.paintBetTracker(g, player);
     }
-
-//    private void paintCardDenomination(Graphics g, PlayingCard card) {
-////        card = new PlayingCard(Location.PLAYER_ONE_CARD_1, new Card(13, 4));
-//        int startImageX = ImageCardCoordination.GLOBAL_INDENT + (card.getDenomination() - 1) * (ImageCardCoordination.WEIGHT + ImageCardCoordination.INDENT_X) + card.getDenomination() / 2;
-//        int startImageY = ImageCardCoordination.GLOBAL_INDENT + (card.getSuit() - 1) * (ImageCardCoordination.HEIGHT + ImageCardCoordination.INDENT_Y);
-//        Image img = new ImageIcon("src/CardsPack/CardsWithGreen2.jpg").getImage();
-//        img = ImageWork.rotate(img, 1);
-////        g.drawImage(img, card.getCoordX(), card.getCoordY(), card.getWight(), card.getHeight(), null);
-//        g.drawImage(img, card.getCoordX(), card.getCoordY(), card.getCoordX() + card.getWight(),
-//                card.getCoordY() + card.getHeight(), startImageX, startImageY , startImageX + ImageCardCoordination.WEIGHT,
-//                startImageY + ImageCardCoordination.HEIGHT, null);
-//    }
-
 }
 
 
@@ -100,20 +124,11 @@ public class Main extends JFrame {
     public Main() {
         super("Hello, graphics!");
 
-        // Запрещаем масштабирование
         setResizable(false);
-        // Останавливаем процесс приложения при закрытии окна
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-
-        // Добавляем рисуемую область на окно
         getContentPane().add(viewport);
-        // Перемасштабируем все элементы, чтобы их размер
-        // соответствовал заданному
         pack();
 
-        // Создаём таймер, который будет "тикать" раз в 33 миллисекунды.
-        // В каждом тике вызываем обновление сцены (для анимации)
-        // и перерисовку сцены.
         timer = new Timer(33, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -121,14 +136,20 @@ public class Main extends JFrame {
 //                viewport.repaint();
             }
         });
+        viewport.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+                System.out.println(e);
 
-        // Показываем окно на экране
+            }
+        });
+
         setVisible(true);
-
-        // Запускаем таймер
 //        timer.start();
 
     }
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(Main::new);

@@ -1,6 +1,9 @@
+package CardsBase;
+
+import CardsBase.Card;
+
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
 
 public class Deck {
     private final int SPADES = 1;
