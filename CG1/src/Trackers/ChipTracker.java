@@ -67,4 +67,8 @@ public class ChipTracker {
             return val;
         }
     }
+
+    public void setWinMoney(int Bank) {
+        money +=Bank;
+    }
 }

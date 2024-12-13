@@ -6,10 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class Deck {
-    private final int SPADES = 1;
-    private final int CLUBS = 2;
-    private final int DIAMONDS = 3;
-    private final int HEARTS = 4;
     private ArrayList<Card> deckList = new ArrayList<>();
 
     public Card getCard() {

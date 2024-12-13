@@ -1,5 +1,6 @@
 import CardsBase.GameParams;
 import CardsBase.PlayingCard;
+import ProcessGame.Player;
 import Trackers.ChipTracker;
 
 import javax.swing.*;
@@ -10,16 +11,47 @@ public class ImageWork  {
     private static final Image CARD_SHIRT_IMAGE = new ImageIcon("src/CardsPack/Shirt.png").getImage();
     private static final Image STAND_IMAGE = new ImageIcon("src/CardsPack/CardsWithGreen2.jpg").getImage();
     private static final Image CHIP_IMAGE = new ImageIcon("src/CardsPack/chip3.png").getImage();
-    private static final Font STATIC_FONT = new Font(null, Font.PLAIN, 20);
+    public static final Font STATIC_FONT = new Font(null, Font.PLAIN, 20);
+    public static final Font WINNER_FONT = new Font(null, Font.PLAIN, 20);
 
     public static void paintCardShirt(Graphics g, PlayingCard card) {
         g.drawImage(CARD_SHIRT_IMAGE, card.getCoordX(), card.getCoordY(), card.getWight(), card.getHeight(), null);
+    }
+
+    public static void paintWinner(Graphics g, Player player) {
+        g.setFont(STATIC_FONT);
+        g.setColor(Color.RED);
+        g.drawString("Winner!", getLastActionX(player.getHandCards()[0], player.getHandCards()[1], "Winner!"),
+                getLastActionY(player.getHandCards()[0], player.getHandCards()[1]));
+    }
+
+    public static void paintLastAction(Graphics g, Player player) {
+        g.setFont(STATIC_FONT);
+        g.setColor(Color.BLACK);
+        g.drawString(player.getLastAction(), getLastActionX(player.getHandCards()[0], player.getHandCards()[1], player.getLastAction()),
+                getLastActionY(player.getHandCards()[0], player.getHandCards()[1]));
+    }
+
+    private static int getLastActionX(PlayingCard card1, PlayingCard card2, String lastAction) {
+        int turn = card1.getTurn() == 1 || card1.getTurn() == 4 ? -1 : 1;
+        int center = (card1.getCoordX() + card2.getCoordX() + card2.getWight()) / 2 - STATIC_FONT.getSize() / 4;
+        center += card1.getTurn() % 2 == 1 ? 0 : (card1.getHeight() / 2 + STATIC_FONT.getSize() * 3 + 65) * turn;
+        center -= (lastAction.length() - 1) * STATIC_FONT.getSize() / 4;
+        return center;
+    }
+
+    private static int getLastActionY(PlayingCard card1, PlayingCard card2) {
+        int turn = card1.getTurn() == 1 || card1.getTurn() == 4 ? -1 : 1;
+        int center = (card1.getCoordY() + card2.getCoordY() + card2.getHeight()) / 2 + STATIC_FONT.getSize() / 3;
+        center += card1.getTurn() % 2 == 0 ? 0 : (card1.getHeight() / 2 + STATIC_FONT.getSize() * 2 + 35) * turn;
+        return center;
     }
 
     public static void paintChip(Graphics g, ChipTracker chipTracker) {
         g.drawImage(CHIP_IMAGE, chipTracker.getX(), chipTracker.getY(),chipTracker.getChipWeight(), chipTracker.getChipHeight(),
                 GameParams.BG_COLOR, null);
         g.setFont(STATIC_FONT);
+        g.setColor(Color.BLACK);
         g.drawString(chipTracker.getMoney().toString() + "$", getChipCenterX(chipTracker), getChipCenterY(chipTracker));
     }
 
@@ -35,6 +67,7 @@ public class ImageWork  {
 
     public static void paintBetTracker(Graphics g, Player player) {
         g.setFont(STATIC_FONT);
+        g.setColor(Color.BLACK);
         g.drawString(player.getBet().toString() + "$", getMoneyTrackerX(player.getHandCards()[0], player.getHandCards()[1], player.getBet()),
                 getMoneyTrackerY(player.getHandCards()[0], player.getHandCards()[1]));
     }

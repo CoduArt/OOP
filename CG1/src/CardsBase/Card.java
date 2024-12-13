@@ -16,4 +16,12 @@ public class Card {
     public int getSuit() {
         return suit;
     }
+
+    public void setDenomination(int denomination) {
+        this.denomination = denomination;
+    }
+
+    public void setSuit(int suit) {
+        this.suit = suit;
+    }
 }

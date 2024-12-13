@@ -1,9 +1,8 @@
-import CardsBase.Deck;
 import CardsBase.GameParams;
-import CardsBase.Location;
 import CardsBase.PlayingCard;
-import Trackers.Buttons;
-import Trackers.ChipTracker;
+import ProcessGame.Player;
+import ProcessGame.Stages;
+import Trackers.Button;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,92 +10,103 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 
 
 class Viewport extends JPanel {
-    private Buttons buttons = new Buttons();
-    private Deck playingDeck = new Deck();
-    private ArrayList<PlayingCard> cardList = new ArrayList<>();
-    private ArrayList<Player> players = new ArrayList<>();
-    private int currentPlayer;
-
 
 
     public Viewport() {
         setBackground(GameParams.BG_COLOR);
         setPreferredSize(new Dimension(GameParams.VIEWPORT_WIDTH, GameParams.VIEWPORT_HEIGHT));
-        startNewGame();
+        Stages.startNewGame();
     }
 
-    public void startNewGame() {
-        dealsCards();
-        players.clear();
-        for (int i = 1; i < 8; i += 2) {
-            players.add(new Player(null, null, new ChipTracker(cardList.get(i))));
-        }
-        currentPlayer = 4;
-        startNewTurn();
-    }
-
-    public void startNewTurn() {
-        dealsCards();
-        int countCards = 1;
-        int countPlayers = 0;
-        while (countPlayers < players.size()) {
-            players.get(countPlayers).newLayout(cardList.get(countCards - 1), cardList.get(countCards));
-            countCards += 2;
-            countPlayers++;
-        }
-        if (currentPlayer > 3) {
-            currentPlayer = 0;
+    public void update() throws InterruptedException {
+        if (Stages.hasAWinner != -1) {
+            Thread.sleep(5000);
+            Stages.players.get(Stages.hasAWinner).setWinner(false);
+            Stages.startNewTurn();
+        } else if (Stages.currentPlayer != 0) {
+            Stages.buttons.setVisible(false);
+            Player cur = Stages.players.get(Stages.currentPlayer);
+            if (cur.isCanDo()) {
+                Thread.sleep(1500);
+                Stages.players.get(Stages.currentPlayer).doAction(Stages.MaxBet, Stages.openCards);
+                repaint();
+                Thread.sleep(1000);
+            } else {
+                Stages.nextPlayer();
+            }
+//            if (Stages.currentPlayer == Stages.lastBetPlayer) {
+//                Thread.sleep(900);
+//                if (Stages.nextStage()) {
+//                    for (Player player: Stages.players) {
+//                        player.setLastAction(null);
+//                    }
+////                    repaint();
+//                    Thread.sleep(4000);
+//                }
+//            }
+            Stages.isEndOfTurn();
+        } else if (Stages.players.get(0).isCanDo()){
+            Stages.buttons.setVisible(true);
         } else {
-            currentPlayer++;
+            Stages.nextPlayer();
         }
-    }
-
-     private void dealsCards() {
-        playingDeck.updateDeck();
-        cardList.clear();
-         for (Location location: Location.values()) {
-             cardList.add(new PlayingCard(location, playingDeck.getCard()));
-         }
-     }
-
-    public void update(float delta) {
-
     }
 
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        for (PlayingCard card: cardList) {
+        for (PlayingCard card: Stages.cardList) {
             drawingClass.drawPlayingCard(g, card);
         }
-        for (Player player: players) {
+        for (Player player: Stages.players) {
             drawingClass.drawMoneysTrackers(g, player);
+            drawingClass.drawLastAction(g, player);
+            drawingClass.drawWinner(g, player);
         }
-        for (Trackers.Button button: buttons.getButtons()) {
-            drawingClass.drawButton(g, button);
+        if (Stages.buttons.isVisible()) {
+            for (Trackers.Button button : Stages.buttons.getButtons()) {
+                drawingClass.drawButton(g, button);
+            }
         }
-
+        drawingClass.drawPot(g, Stages.pot);
     }
 
 }
 
 class drawingClass {
-    private static final Font TEXT_FONT = new Font(null, Font.PLAIN, 20);
+
+    public static void drawWinner(Graphics g, Player player) {
+        if (player.isWinner()) {
+            ImageWork.paintWinner(g, player);
+        }
+    }
+
+    public static void drawLastAction(Graphics g, Player player) {
+        if (player.getLastAction() != null) {
+            ImageWork.paintLastAction(g, player);
+        }
+    }
+
+    public static void drawPot(Graphics g, Integer pot) {
+        g.setColor(Color.BLACK);
+        g.drawString(pot.toString() + "$",
+                GameParams.VIEWPORT_WIDTH / 2 - ImageWork.STATIC_FONT.getSize() / 4 - pot.toString().length() * ImageWork.STATIC_FONT.getSize() / 4,
+                GameParams.VIEWPORT_HEIGHT / 2 + GameParams.VIEWPORT_HEIGHT / 7);
+    }
 
     public static void drawButton(Graphics g, Trackers.Button button) {
         g.setColor(new Color(0x413535));
         g.fillRoundRect(button.getX(), button.getY(), button.getWight(), button.getHeight(), 15, 15);
-        g.setFont(TEXT_FONT);
+        g.setFont(ImageWork.STATIC_FONT);
         g.setColor(new Color(0x000000));
         g.drawRoundRect(button.getX(), button.getY(), button.getWight(), button.getHeight(), 15, 15);
-        g.drawString(button.getAction(),
-                button.getX() + button.getWight() / 2 - TEXT_FONT.getSize() / 4 - (button.getAction().length() - 1) * TEXT_FONT.getSize() / 4,
-                button.getY() + button.getHeight() / 2 + TEXT_FONT.getSize() / 3);
+        g.drawString(button.getNameOfAction(),
+                button.getX() + button.getWight() / 2 - ImageWork.STATIC_FONT.getSize() / 4 - (button.getNameOfAction().length() - 1) * ImageWork.STATIC_FONT.getSize() / 4,
+                button.getY() + button.getHeight() / 2 + ImageWork.STATIC_FONT.getSize() / 3);
     }
 
     public static void drawPlayingCard(Graphics g, PlayingCard card) {
@@ -107,6 +117,7 @@ class drawingClass {
             g.setColor(Color.BLACK);
             g.drawRoundRect(card.getCoordX(), card.getCoordY(), card.getWight(), card.getHeight(), 15, 15);
         }
+//        ImageWork.paintCardImage(g, card);
     }
 
     public static void drawMoneysTrackers(Graphics g, Player player) {
@@ -119,7 +130,7 @@ class drawingClass {
 
 public class Main extends JFrame {
     private Timer timer;
-    private Viewport viewport = new Viewport();
+    public Viewport viewport = new Viewport();
 
     public Main() {
         super("Hello, graphics!");
@@ -132,21 +143,33 @@ public class Main extends JFrame {
         timer = new Timer(33, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                viewport.update(1.0f / 33.0f);
-//                viewport.repaint();
+                try {
+                    viewport.update();
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+                viewport.repaint();
             }
         });
         viewport.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
-                System.out.println(e);
-
+                if (Stages.buttons.isVisible()) {
+                    for (Button button: Stages.buttons.getButtons()) {
+                        if(button.inButton(e.getX(), e.getY())) {
+                            button.run();
+                            viewport.repaint();
+                            Stages.buttons.setVisible(false);
+                            break;
+                        }
+                    }
+                }
             }
         });
 
         setVisible(true);
-//        timer.start();
+        timer.start();
 
     }
 

@@ -102,5 +102,9 @@ public class PlayingCard extends Card {
     public int isOpened() {
         return opened;
     }
+
+    public void setOpened(int open) {
+        opened = open;
+    }
 }
 
