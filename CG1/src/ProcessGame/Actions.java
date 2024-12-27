@@ -4,13 +4,13 @@ public class Actions {
     public static String doFold(Player player) {
         player.doFold();
         player.setLastAction("Fold");
-        Stages.nextPlayer();
+//        Stages.nextPlayer();
         if (Stages.isRemainedLastPlayer()) {
             return null;
         }
-        if (player.getNumber() == Stages.lastBetPlayer) {
-            Stages.nextLastPlayer();
-        }
+//        if (player.getNumber() == Stages.lastBetPlayer) {
+//            Stages.nextLastPlayer();
+//        }
         return "Fold";
     }
 
@@ -18,11 +18,11 @@ public class Actions {
         if (player.getBet() != Stages.MaxBet) {
             player.doBet(Stages.MaxBet);
             player.setLastAction("Call");
-            Stages.nextPlayer();
+//            Stages.nextPlayer();
             return "Call";
         } else {
             player.setLastAction("Check");
-            Stages.nextPlayer();
+//            Stages.nextPlayer();
             return "Check";
         }
     }
@@ -34,7 +34,7 @@ public class Actions {
             player1.setLastAction(null);
         }
         player.setLastAction("Rise");
-        Stages.nextPlayer();
+//        Stages.nextPlayer();
         return "Rise";
     }
 }

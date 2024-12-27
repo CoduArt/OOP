@@ -158,7 +158,7 @@ public class Stages {
         }
     }
 
-    private static void playerPlus() {
+    public static void playerPlus() {
         currentPlayer++;
         if (currentPlayer == 4) {
             currentPlayer = 0;

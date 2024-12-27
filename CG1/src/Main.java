@@ -23,7 +23,7 @@ class Viewport extends JPanel {
 
     public void update() throws InterruptedException {
         if (Stages.hasAWinner != -1) {
-            Thread.sleep(15000);
+            Thread.sleep(5000);
             Stages.players.get(Stages.hasAWinner).setWinner(false);
             Stages.startNewTurn();
         } else if (Stages.currentPlayer != 0) {
@@ -34,24 +34,15 @@ class Viewport extends JPanel {
                 Stages.players.get(Stages.currentPlayer).doAction();
                 repaint();
                 Thread.sleep(1000);
-            } else {
-                Stages.nextPlayer();
             }
-//            if (Stages.currentPlayer == Stages.lastBetPlayer) {
-//                Thread.sleep(900);
-//                if (Stages.nextStage()) {
-//                    for (Player player: Stages.players) {
-//                        player.setLastAction(null);
-//                    }
-////                    repaint();
-////                    Thread.sleep(4000);
-//                }
-//            }
+//                Stages.nextPlayer();
+            Stages.playerPlus();
             Stages.isEndOfTurn();
         } else if (Stages.players.get(0).isCanDo()){
             Stages.buttons.setVisible(true);
         } else {
-            Stages.nextPlayer();
+//            Stages.nextPlayer();
+            Stages.playerPlus();
         }
     }
 

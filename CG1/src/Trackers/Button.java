@@ -52,6 +52,7 @@ public class Button {
 
     public void run() {
         action.run();
+        Stages.playerPlus();
         Stages.isEndOfTurn();
     }
 }
