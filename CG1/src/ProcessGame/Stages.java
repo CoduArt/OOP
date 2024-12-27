@@ -7,6 +7,7 @@ import Trackers.Buttons;
 import Trackers.ChipTracker;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Random;
 
 public class Stages {
@@ -35,11 +36,15 @@ public class Stages {
             case 3 -> {openCards();
             return true;}
         }
+        for (Player player: players) {
+            player.setCombination(new Combination(player, openCards));
+        }
         stage++;
         return false;
     }
 
     private static void winProcess(Player player) {
+        player.setLastAction(null);
         player.getChipTracker().setWinMoney(pot);
         player.setWinner(true);
         hasAWinner = player.getNumber();
@@ -55,7 +60,12 @@ public class Stages {
                 winnerList.add(new Combination(player, openCards));
             }
         }
-        winnerList.sort((x, y) -> y.getCombination() - x.getCombination());
+        winnerList.sort((x, y) -> {
+            if (y.getCombination() - x.getCombination() == 0) {
+                return y.getHighestCard() - x.getHighestCard();
+            }
+            return y.getCombination() - x.getCombination();
+        });
         winProcess(winnerList.get(0).getPlayer());
     }
 
@@ -140,22 +150,64 @@ public class Stages {
     }
 
     public static void nextPlayer() {
+        playerPlus();
+//        isEndOfTurn();
+        while (!players.get(currentPlayer).isCanDo()) {
+            playerPlus();
+//            isEndOfTurn();
+        }
+    }
+
+    private static void playerPlus() {
         currentPlayer++;
         if (currentPlayer == 4) {
             currentPlayer = 0;
         }
-        while (players.get(currentPlayer).isLose()) {
-            nextPlayer();
-        }
     }
 
     public static void nextDealer() {
+        dealerPlus();
+        while (players.get(currentPlayer).isLose()) {
+            dealerPlus();
+        }
+    }
+
+    private static void dealerPlus() {
         dealer++;
         if (dealer == 4) {
             dealer = 0;
         }
-        while (players.get(currentPlayer).isLose()) {
-            nextDealer();
+    }
+
+    public static void nextLastPlayer() {
+        lastPlayerPlus();
+        while (!players.get(lastBetPlayer).isCanDo()) {
+            lastPlayerPlus();
         }
+    }
+
+    private static void lastPlayerPlus() {
+        lastBetPlayer++;
+        if (lastBetPlayer == 4) {
+            lastBetPlayer = 0;
+        }
+    }
+
+    public static boolean isRemainedLastPlayer() {
+        Player lastPlayer = null;
+        for (Player player: players) {
+            if (player.isInGame()) {
+                if (lastPlayer == null) {
+                    lastPlayer = player;
+                } else {
+                    return false;
+                }
+            }
+        }
+        if (lastPlayer == null) {
+            throw new RuntimeException("Неверный просчёт проверки на последнего игрока");
+        }
+        winProcess(lastPlayer);
+        return true;
     }
 }

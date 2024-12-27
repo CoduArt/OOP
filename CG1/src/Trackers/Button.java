@@ -42,6 +42,11 @@ public class Button {
     }
 
     public String getNameOfAction() {
+        if (nameOfAction.equals("Call")) {
+            if (Stages.MaxBet == Stages.players.get(0).getBet()) {
+                return "Check";
+            }
+        }
         return nameOfAction;
     }
 

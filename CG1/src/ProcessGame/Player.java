@@ -3,11 +3,13 @@ package ProcessGame;
 import CardsBase.PlayingCard;
 import Trackers.ChipTracker;
 
-import java.util.ArrayList;
+import java.util.Random;
 
 public class Player {
+    private Random random = new Random();
     private int number;
     private PlayingCard[] handCards = new PlayingCard[2];
+    private Combination combination;
     private ChipTracker chipTracker;
     private Integer bet = 0;
     private String lastAction;
@@ -23,8 +25,43 @@ public class Player {
         this.number = number;
     }
 
-    public void doAction(int maxBet, ArrayList<PlayingCard> visibleCenterCards) {
-        Actions.doCall(this);
+    public void doAction() {
+//        Actions.doCallOrCheck(this);
+
+        int cost = 0;
+        if (Stages.stage == 0) {
+            if (handCards[0].getSuit() == handCards[1].getSuit()) {
+                cost += 14;
+            }
+            for (PlayingCard card: handCards) {
+                if (card.getDenomination() == 1) {
+                    cost += 12;
+                } else {
+                    cost += card.getDenomination();
+                }
+            }
+            int action = cost + random.nextInt(50);
+            if (action < 30) {
+                Actions.doFold(this);
+            } else if (action > 65) {
+                Actions.doRise(this);
+            } else {
+                Actions.doCallOrCheck(this);
+            }
+        } else {
+            cost += combination.getCombination() * 20 + combination.getOuts() * 2;
+            int action = cost + random.nextInt(60);
+            if (Stages.MaxBet != bet) {
+                action -= 20;
+            }
+            if (action < 45) {
+                Actions.doFold(this);
+            } else if (action > 110) {
+                Actions.doRise(this);
+            } else {
+                Actions.doCallOrCheck(this);
+            }
+        }
     }
 
     public void newLayout(PlayingCard first, PlayingCard second) {
@@ -39,7 +76,7 @@ public class Player {
     public Integer doBet(int Pot) {
         Stages.pot += Pot - bet;
         bet += chipTracker.ChangeMoney(Pot - bet);
-        if (bet < Stages.MaxBet) {
+        if (chipTracker.getMoney() == 0) {
             canDo = false;
         }
         return bet;
@@ -67,6 +104,14 @@ public class Player {
 
     public int getNumber() {
         return number;
+    }
+
+    public Combination getCombination() {
+        return combination;
+    }
+
+    public void setCombination(Combination combination) {
+        this.combination = combination;
     }
 
     public boolean isWinner() {
@@ -113,6 +158,7 @@ public class Player {
     public void startNewTurn() {
         if (chipTracker.getMoney() == 0) {
             loseInGame();
+            bet = 0;
         } else {
             bet = 0;
             inGame = true;

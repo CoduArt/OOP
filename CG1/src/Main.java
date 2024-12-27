@@ -23,7 +23,7 @@ class Viewport extends JPanel {
 
     public void update() throws InterruptedException {
         if (Stages.hasAWinner != -1) {
-            Thread.sleep(5000);
+            Thread.sleep(15000);
             Stages.players.get(Stages.hasAWinner).setWinner(false);
             Stages.startNewTurn();
         } else if (Stages.currentPlayer != 0) {
@@ -31,7 +31,7 @@ class Viewport extends JPanel {
             Player cur = Stages.players.get(Stages.currentPlayer);
             if (cur.isCanDo()) {
                 Thread.sleep(1500);
-                Stages.players.get(Stages.currentPlayer).doAction(Stages.MaxBet, Stages.openCards);
+                Stages.players.get(Stages.currentPlayer).doAction();
                 repaint();
                 Thread.sleep(1000);
             } else {
@@ -44,7 +44,7 @@ class Viewport extends JPanel {
 //                        player.setLastAction(null);
 //                    }
 ////                    repaint();
-//                    Thread.sleep(4000);
+////                    Thread.sleep(4000);
 //                }
 //            }
             Stages.isEndOfTurn();
